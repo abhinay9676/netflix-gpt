@@ -7,6 +7,12 @@ import React from 'react'
     import { useSelector } from 'react-redux';
     import { useEffect } from 'react'
     import { onAuthStateChanged } from "firebase/auth";
+    import { toggleGptSerachView } from '../utils/gptSlice.js';
+
+    import { SUPPORTED_LANGUAGES } from '../utils/constant.js';
+    import { changeLanguage } from '../utils/configSlice.js';
+   
+   
     
 
 
@@ -16,12 +22,15 @@ import React from 'react'
 
 const Header = () => {
 
+ 
+
     const [errorMessage, setErrorMessage] = React.useState(null);
 
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
     const user = useSelector((store)=>store.user);
+    const showGptSearch = useSelector(store=>store.gpt.showGptSearch);
 
     
 
@@ -64,6 +73,16 @@ signOut(auth).then(() => {
     return () => unsubscribe();
 
     },[dispatch,navigate]);
+
+    const handleGptSearchClick = () => {
+
+      dispatch(toggleGptSerachView());
+
+    }
+    const handleLanguageChange=(e)=>{
+      dispatch(changeLanguage(e.target.value));
+      
+    }
   return (
     <div className='absolute w-screen px-8 py-2 bg-gradient-to-b from-black z-10 flex flex-col md:flex-row justify-between'>
 
@@ -71,6 +90,14 @@ signOut(auth).then(() => {
     alt='Netflix Logo'/>
 {user && (
     <div>
+     {showGptSearch && ( <select className='p-2 m-2 bg-gray-900 text-white' onChange={handleLanguageChange}>
+        {SUPPORTED_LANGUAGES.map(lang=><option key={lang.identifier}>{lang.name}</option>)}
+       
+
+      </select>
+     )}
+
+      <button className='bg-blue-600 px-4 py-2 rounded-sm text-lg font-semibold mr-4' onClick={handleGptSearchClick}>{showGptSearch ? "Home": "GptSearch"}</button>
         <button className='bg-red-600 px-4 py-2 rounded-sm text-lg font-semibold' onClick={handleSignOut}>Sign out</button>
     </div>)}
     </div>
